@@ -1,5 +1,14 @@
 # @terrazzo/plugin-token-listing
 
+## 1.0.0
+
+### Patch Changes
+
+- Updated dependencies [[`96972d4`](https://github.com/terrazzoapp/terrazzo/commit/96972d4d4aee14a7ca290864c275a48e8f9139ba)]:
+  - @terrazzo/cli@2.3.0
+  - @terrazzo/parser@2.3.0
+  - @terrazzo/token-tools@2.3.0
+
 ## 0.1.0-alpha.0
 
 ### Minor Changes

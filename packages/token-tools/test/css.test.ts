@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   makeCSSVar,
   transformBoolean,
+  transformBorder,
   transformColor,
   transformCSSValue,
   type TransformCSSValueOptions,
@@ -242,6 +243,82 @@ describe('transformBoolean', () => {
     let result: typeof want.success;
     try {
       result = transformBoolean(...given);
+    } catch (error) {
+      expect((error as Error).message).toBe(want.error);
+    }
+    expect(result).toEqual(want.success);
+  });
+});
+
+describe('transformBorder', () => {
+  const tests: Test<[any, TransformCSSValueOptions], ReturnType<typeof transformBorder>>[] = [
+    [
+      'basic',
+      {
+        given: [
+          {
+            $value: {
+              color: { colorSpace: 'srgb', components: [0.4, 0.2, 0.6], alpha: 1 },
+              width: { value: 1, unit: 'px' },
+              style: 'solid',
+            },
+          },
+          { tokensSet: {}, permutation: {} },
+        ],
+        want: { success: '1px solid rgb(40% 20% 60%)' },
+      },
+    ],
+    [
+      'wide gamut color',
+      {
+        given: [
+          {
+            $value: {
+              color: { colorSpace: 'oklch', components: [0.9, 0.1, 40], alpha: 1 },
+              width: { value: 1, unit: 'px' },
+              style: 'solid',
+            },
+          },
+          { tokensSet: {}, permutation: {} },
+        ],
+        want: {
+          success: {
+            '.': '1px solid oklch(90% 0.1 40)',
+            srgb: '1px solid oklch(88.72% 0.0638 44.98)',
+            p3: '1px solid oklch(88.8% 0.0809 44.27)',
+            rec2020: '1px solid oklch(90% 0.1 40)',
+          },
+        },
+      },
+    ],
+    [
+      'color inside p3 but outside srgb',
+      {
+        given: [
+          {
+            $value: {
+              color: { colorSpace: 'display-p3', components: [1, 0, 0], alpha: 1 },
+              width: { value: 1, unit: 'px' },
+              style: 'solid',
+            },
+          },
+          { tokensSet: {}, permutation: {} },
+        ],
+        want: {
+          success: {
+            '.': '1px solid color(display-p3 1 0 0)',
+            srgb: '1px solid color(display-p3 0.9178 0.2107 0.1542)',
+            p3: '1px solid color(display-p3 1 0 0)',
+            rec2020: '1px solid color(display-p3 1 0 0.0159)',
+          },
+        },
+      },
+    ],
+  ];
+  it.each(tests)('%s', (_, { given, want }) => {
+    let result: typeof want.success;
+    try {
+      result = transformBorder(...given);
     } catch (error) {
       expect((error as Error).message).toBe(want.error);
     }

@@ -1,7 +1,3 @@
-import '../color.js'; // load Color.js side-effects
-
-import { inGamut, parse } from 'colorjs.io/fn';
-
 import type {
   BorderTokenNormalized,
   ColorTokenNormalized,
@@ -41,8 +37,7 @@ export function transformBorder(
       ' ',
     );
 
-  // Note: ../color.js has already loaded color spaces as side effects so we don’t need to load those again
-  return typeof color === 'string' || inGamut(parse(color.p3!), 'display-p3')
+  return typeof color === 'string'
     ? formatBorder('.')
     : {
         '.': formatBorder('.'),

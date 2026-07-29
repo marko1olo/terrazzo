@@ -47,12 +47,13 @@ export const COLOR_SPACE: Record<ColorSpace, ColorJS> = {
   'xyz-d65': XYZ_D65,
 };
 
-const COLOR_ID_TO_SPACE: Record<string, ColorJS> = {};
-for (const s of Object.values(COLOR_SPACE)) {
+/** Map Color.js space IDs (and aliases) back to their COLOR_SPACE key */
+const COLOR_ID_TO_TOKEN_SPACE: Record<string, ColorSpace> = {};
+for (const [colorSpace, s] of Object.entries(COLOR_SPACE) as [ColorSpace, ColorJS][]) {
   ColorJS.register(s);
-  COLOR_ID_TO_SPACE[s.id] = s;
+  COLOR_ID_TO_TOKEN_SPACE[s.id] = colorSpace;
   for (const alias of s.aliases ?? []) {
-    COLOR_ID_TO_SPACE[alias] = s;
+    COLOR_ID_TO_TOKEN_SPACE[alias] = colorSpace;
   }
 }
 
@@ -60,7 +61,7 @@ for (const s of Object.values(COLOR_SPACE)) {
 export function parseColor(color: string): ColorValueNormalized {
   const result = parse(color);
   const value: ColorValueNormalized = {
-    colorSpace: COLOR_ID_TO_SPACE[result.spaceId]!.cssId as ColorSpace,
+    colorSpace: COLOR_ID_TO_TOKEN_SPACE[result.spaceId]!,
     components: result.coords,
     alpha: result.alpha ?? 1,
   };

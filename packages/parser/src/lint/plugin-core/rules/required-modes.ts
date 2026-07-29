@@ -60,13 +60,16 @@ const rule: LintRule<never, RuleRequiredModesOptions> = {
           }
         }
 
-        if (!tokensMatched) {
-          report({
-            message: `Match "${matchI}": no tokens matched ${JSON.stringify(match)}`,
-            node: t.source.node,
-            filename: t.source.filename,
-          });
-        }
+      }
+
+      // Outside the loop. In it this could never fire: the line above sets tokensMatched
+      // before the check, and a match that hits nothing never enters the body at all. There
+      // is then no token to attribute the report to, which is how core/required-children
+      // reports the same condition.
+      if (!tokensMatched) {
+        report({
+          message: `Match "${matchI}": no tokens matched ${JSON.stringify(match)}`,
+        });
       }
     }
   },

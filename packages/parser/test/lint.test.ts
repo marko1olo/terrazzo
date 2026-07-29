@@ -171,6 +171,20 @@ describe('rules', () => {
       },
     ],
     [
+      `[${CONSISTENT_NAMING}] kebab-case (success; ignored)`,
+      {
+        given: {
+          rule: CONSISTENT_NAMING,
+          options: { format: 'kebab-case', ignore: ['legacy.**'] },
+          tokens: {
+            legacy: { camelCase: { $type: 'number', $value: 42 } },
+            token: { 'kebab-case': { $type: 'number', $value: 42 } },
+          },
+        },
+        want: { success: true },
+      },
+    ],
+    [
       `[${CONSISTENT_NAMING}] camelCase (success)`,
       {
         given: {
@@ -609,6 +623,23 @@ describe('rules', () => {
           },
         },
         want: { errors: ['Token typography.size.body: missing required mode "mobile"'] },
+      },
+    ],
+    [
+      `[${REQUIRED_MODES}] empty match (fail)`,
+      {
+        given: {
+          rule: REQUIRED_MODES,
+          options: { matches: [{ match: ['typografy.**'], modes: ['mobile'] }] },
+          tokens: {
+            typography: {
+              size: {
+                body: { $type: 'dimension', $value: { value: 16, unit: 'px' } },
+              },
+            },
+          },
+        },
+        want: { errors: ['Match "0": no tokens matched ["typografy.**"]'] },
       },
     ],
     [

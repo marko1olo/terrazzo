@@ -2,6 +2,7 @@ import { camelCase, kebabCase, pascalCase, snakeCase } from 'scule';
 
 import type { LintRule } from '../../../types.js';
 import { docsLink } from '../lib/docs.js';
+import { cachedLintMatcher } from '../lib/matchers.js';
 
 export const CONSISTENT_NAMING = 'core/consistent-naming';
 export const ERROR_WRONG_FORMAT = 'ERROR_WRONG_FORMAT';
@@ -39,7 +40,14 @@ const rule: LintRule<typeof ERROR_WRONG_FORMAT, RuleConsistentNamingOptions> = {
       SCREAMING_SNAKE_CASE: (name: string) => snakeCase(name).toLocaleUpperCase(),
     }[String(options.format)];
 
+    const shouldIgnore = options.ignore ? cachedLintMatcher.tokenIDMatch(options.ignore) : null;
+
     for (const t of Object.values(tokens)) {
+      // skip ignored tokens
+      if (shouldIgnore?.(t.id)) {
+        continue;
+      }
+
       if (basicFormatter) {
         const parts = t.id.split('.');
         if (!parts.every((part) => basicFormatter(part) === part)) {

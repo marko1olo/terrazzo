@@ -58,7 +58,9 @@ export default function generateUtilityCSS(
         label: PLUGIN_NAME,
         message: `utility group "${group}" matched 0 tokens: ${JSON.stringify(selectors)}`,
       });
-      break;
+      // continue, not break: the innermost breakable statement here is the for-of, not the
+      // switch below, so breaking abandoned every group after this one.
+      continue;
     }
     switch (group) {
       case 'bg': {

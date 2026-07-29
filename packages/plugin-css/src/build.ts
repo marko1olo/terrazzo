@@ -101,7 +101,12 @@ function generatePropertyDefinition(
 
 function generatePropertyDefinitions(
   getTransforms: BuildHookOptions['getTransforms'],
-  options: { include: (id: string) => boolean; exclude: (id: string) => boolean },
+  options: {
+    include: (id: string) => boolean;
+    exclude: (id: string) => boolean;
+    /** Must be the same sub value namer the declaration emitters use, or `@property` would register names that are never declared. */
+    makeSubValueId: (variableName: string, subValueName: string, token: TokenTransformed) => string;
+  },
 ): CSSRule[] {
   const tokens = getTransforms({ format: FORMAT_ID });
   const properties: CSSRule[] = [];
@@ -130,7 +135,7 @@ function generatePropertyDefinitions(
       }
     } else if (token.type === 'MULTI_VALUE') {
       for (const [name, subValue] of Object.entries(token.value)) {
-        const subID = name === '.' ? localID : `${localID}-${name}`;
+        const subID = name === '.' ? localID : options.makeSubValueId(localID, name, token);
         if (seen.has(subID)) {
           continue;
         }
@@ -185,7 +190,11 @@ export default function buildCSS({
   const exclude = userExclude ? cachedMatcher.tokenIDMatch(userExclude) : () => false;
   let propertyDefsNodes: CSSRule[] = [];
   if (propertyDefinitions) {
-    propertyDefsNodes = generatePropertyDefinitions(getTransforms, { include, exclude });
+    propertyDefsNodes = generatePropertyDefinitions(getTransforms, {
+      include,
+      exclude,
+      makeSubValueId,
+    });
   }
   if (permutations?.length) {
     let output = '';

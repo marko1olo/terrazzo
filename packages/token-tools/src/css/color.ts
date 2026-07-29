@@ -1,4 +1,4 @@
-import { type ColorConstructor, inGamut, serialize, to as convert } from 'colorjs.io/fn';
+import { inGamut, type PlainColorObject, serialize, to as convert } from 'colorjs.io/fn';
 
 import { parseColor, tokenToColor } from '../color.js';
 import type { ColorTokenNormalized, TokenTransformed } from '../types.js';
@@ -38,7 +38,7 @@ export function transformColor(
 
   return inGamut(color, 'srgb')
     ? serialize(color, { format: options.color?.legacyHex ? 'hex' : undefined })
-    : downsample({ colorSpace, components, alpha }, color, options.color?.depth);
+    : downsample(color, options.color?.depth);
 }
 
 export const DEPTH_ROUNDING = {
@@ -53,14 +53,10 @@ export type Depth = keyof typeof DEPTH_ROUNDING | 'unlimited';
 /**
  * Downsample color to srgb, display-p3, and rec2020 color spaces.
  */
-function downsample(
-  $value: ColorTokenNormalized['$value'],
-  color: ColorConstructor,
-  depth: Depth = 30,
-): TokenTransformed['value'] {
-  const srgb = convert(color, $value.colorSpace, { inGamut: { space: 'srgb' } });
-  const p3 = convert(color, $value.colorSpace, { inGamut: { space: 'p3' } });
-  const rec2020 = convert(color, $value.colorSpace, { inGamut: { space: 'rec2020' } });
+function downsample(color: PlainColorObject, depth: Depth = 30): TokenTransformed['value'] {
+  const srgb = convert(color, color.space, { inGamut: { space: 'srgb' } });
+  const p3 = convert(color, color.space, { inGamut: { space: 'p3' } });
+  const rec2020 = convert(color, color.space, { inGamut: { space: 'rec2020' } });
   if (typeof depth === 'number' && !DEPTH_ROUNDING[depth]) {
     throw new Error(
       `Invalid bit depth: ${depth}. Supported values: ${Object.keys(DEPTH_ROUNDING).join(', ')}`,

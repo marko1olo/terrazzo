@@ -282,6 +282,23 @@ describe('transformColor', () => {
       },
     ],
     [
+      'a98-rgb (out of gamut)',
+      {
+        given: [
+          { $value: { colorSpace: 'a98-rgb', components: [1, 0, 0] } },
+          { tokensSet: {}, permutation: {} },
+        ],
+        want: {
+          success: {
+            '.': 'color(a98-rgb 1 0 0)',
+            srgb: 'color(a98-rgb 0.8742 0.3529 0.2915)',
+            p3: 'color(a98-rgb 0.9404 0.2054 0.1599)',
+            rec2020: 'color(a98-rgb 1 0 0)',
+          },
+        },
+      },
+    ],
+    [
       'lrgb',
       {
         given: [
@@ -302,6 +319,23 @@ describe('transformColor', () => {
       },
     ],
     [
+      'p3 (out of gamut)',
+      {
+        given: [
+          { $value: { colorSpace: 'display-p3', components: [1, 0, 0] } },
+          { tokensSet: {}, permutation: {} },
+        ],
+        want: {
+          success: {
+            '.': 'color(display-p3 1 0 0)',
+            srgb: 'color(display-p3 0.9178 0.2107 0.1542)',
+            p3: 'color(display-p3 1 0 0)',
+            rec2020: 'color(display-p3 1 0 0.0159)',
+          },
+        },
+      },
+    ],
+    [
       'prophoto-rgb',
       {
         given: [
@@ -309,6 +343,23 @@ describe('transformColor', () => {
           { tokensSet: {}, permutation: {} },
         ],
         want: { success: 'color(prophoto-rgb 0.4 0.2 0.6)' },
+      },
+    ],
+    [
+      'prophoto-rgb (out of gamut)',
+      {
+        given: [
+          { $value: { colorSpace: 'prophoto-rgb', components: [1, 0, 0] } },
+          { tokensSet: {}, permutation: {} },
+        ],
+        want: {
+          success: {
+            '.': 'color(prophoto-rgb 1 0 0)',
+            srgb: 'color(prophoto-rgb 0.7375 0.3877 0.3384)',
+            p3: 'color(prophoto-rgb 0.7942 0.3331 0.281)',
+            rec2020: 'color(prophoto-rgb 0.9072 0.1988 0.1443)',
+          },
+        },
       },
     ],
     [
